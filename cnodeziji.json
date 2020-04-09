@@ -1,0 +1,472 @@
+{
+	"info": {
+		"_postman_id": "1337c039-8812-41f6-9b8b-dcfa36e3c5bd",
+		"name": "Cnode",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "主题发布验证",
+			"item": [
+				{
+					"name": "发布主题",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "776a88e6-bd35-4a6d-8bac-530aa98e7671",
+								"exec": [
+									"pm.environment.set(\"title\", \"d77892111111\");",
+									"pm.environment.set(\"tab\", \"ask\");",
+									"pm.environment.set(\"content\", \"主题测试内容哈哈\");"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "40b20b9c-2c21-406a-bb32-0f02ff78331e",
+								"exec": [
+									"var url = pm.globals.get(\"sever_url\");",
+									"console.log(\"++++++++++++++++++++++\",url);",
+									"",
+									"var v = pm.variables.get(\"abc\");",
+									"console.log(\"++++++++++++++++++++++\",v);",
+									"",
+									"// 拿到服务器响应结果并转化为json数据类型",
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"服务器响应结果中包含success字段值为 true\", function () {",
+									"",
+									"",
+									"    // 打印输出",
+									"    console.log(\"jsonData=============\",jsonData['success']",
+									"        ,jsonData['topic_id']);",
+									"    // 获取主题id，设置一个全局变量",
+									"    pm.globals.set(\"topic_id\",jsonData['topic_id']);",
+									"    //添加断言",
+									"    pm.expect(jsonData['success']).to.eql(true);",
+									"});",
+									"",
+									"",
+									"pm.test(\"状态码为200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"",
+									"pm.test(\"包含字符串\", function () {",
+									"    pm.expect(pm.response.text()).to.include('\"success\":true,');",
+									"});",
+									"",
+									"",
+									"pm.test(\"Response time is less than 200ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "accesstoken",
+									"value": "cef0f25d-ebd8-4d11-bd6d-c02ddfb7d7e1",
+									"type": "text"
+								},
+								{
+									"key": "title",
+									"value": "{{title}}",
+									"type": "text"
+								},
+								{
+									"key": "tab",
+									"value": "{{tab}}",
+									"type": "text"
+								},
+								{
+									"key": "content",
+									"value": "{{content}}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{sever_url}}/topics",
+							"host": [
+								"{{sever_url}}"
+							],
+							"path": [
+								"topics"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "主题详情",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "6898ba9c-61a4-4a4f-af81-bc9f3c3005d8",
+								"exec": [
+									"// 拿到服务器响应结果并转化为json数据类型",
+									"var jsonData = pm.response.json();",
+									"",
+									"// 实际结果值",
+									"var title = jsonData['data']['title']",
+									"var content = jsonData['data']['content']",
+									"var tab = jsonData['data']['tab']",
+									"",
+									"// console.log(\"实际结果值\",title,content,tab);",
+									"",
+									"",
+									"// 我们的期望值",
+									"var expect_title = pm.environment.get(\"title\");",
+									"var expect_content = pm.environment.get(\"content\");",
+									"var expect_tab = pm.environment.get(\"tab\");",
+									"",
+									"// console.log(\"我们的期望结果\",expect_title,expect_content,expect_tab);",
+									"",
+									"pm.test(\"检查title字段\", function () {",
+									"",
+									"    pm.expect(title).to.eql(expect_title);",
+									"});",
+									"",
+									"pm.test(\"检查content字段\", function () {",
+									"",
+									"    pm.expect(content).to.eql(expect_content);",
+									"});",
+									"",
+									"pm.test(\"检查tab字段\", function () {",
+									"",
+									"    pm.expect(tab).to.eql(expect_tab);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{sever_url}}/topic/{{topic_id}}?mdrender=false",
+							"host": [
+								"{{sever_url}}"
+							],
+							"path": [
+								"topic",
+								"{{topic_id}}"
+							],
+							"query": [
+								{
+									"key": "mdrender",
+									"value": "false"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "主题发布验证csv参数",
+			"item": [
+				{
+					"name": "发布主题—csv",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "a8e49539-8626-4488-8352-482d32c4ffdf",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "16487cfe-fa5a-4e70-82b7-ea2729052b48",
+								"exec": [
+									"// 拿到服务器响应结果并转化为json数据类型\r",
+									"var jsonData = pm.response.json();\r",
+									"var expect_status_code = pm.variables.get(\"expect_status_code\");\r",
+									"\r",
+									"pm.test(\"状态码\"+expect_status_code, function () {\r",
+									"    // 需要先获取这个变量\r",
+									"    \r",
+									"    pm.response.to.have.status(expect_status_code);\r",
+									"});\r",
+									"\r",
+									"var status = pm.variables.get(\"status\");\r",
+									"if(status == 'success'){\r",
+									"    pm.test(\"包含字符串\", function () {\r",
+									"        pm.expect(pm.response.text()).to.include('\"success\":true,');\r",
+									"    });\r",
+									"\tpm.test(\"服务器响应结果中包含success字段值为 true\", function () {\r",
+									"\t    \r",
+									"    // 打印输出\r",
+									"    console.log(\"jsonData=============\",jsonData['success'],jsonData['topic_id']);\r",
+									"    // 获取主题id，设置一个全局变量\r",
+									"    pm.globals.set(\"topic_id\",jsonData['topic_id']);\r",
+									"    //添加断言\r",
+									"    pm.expect(jsonData['success']).to.eql(true);\r",
+									"    });\r",
+									"}\r",
+									"    pm.test(\"Response time is less than 200ms\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "accesstoken",
+									"value": "cef0f25d-ebd8-4d11-bd6d-c02ddfb7d7e1",
+									"type": "text"
+								},
+								{
+									"key": "title",
+									"value": "{{title}}",
+									"type": "text"
+								},
+								{
+									"key": "tab",
+									"value": "{{tab}}",
+									"type": "text"
+								},
+								{
+									"key": "content",
+									"value": "{{content}}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{sever_url}}/topics",
+							"host": [
+								"{{sever_url}}"
+							],
+							"path": [
+								"topics"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "主题详情——csv",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "69a18149-e5c0-415a-a48e-7fd500a2aa06",
+								"exec": [
+									"var status = pm.variables.get(\"status\");\r",
+									"\r",
+									"if(status == 'success'){\r",
+									"    // 拿到服务器响应结果并转化为json数据类型\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    // 实际结果值\r",
+									"    var title = jsonData['data']['title']\r",
+									"    var content = jsonData['data']['content']\r",
+									"    var tab = jsonData['data']['tab']\r",
+									"\r",
+									"    // console.log(\"实际结果值\",title,content,tab);\r",
+									"\r",
+									"\r",
+									"    // 我们的期望值，用环境变量的值,此时不是局部变量的值了,注意转换成字符串\r",
+									"    var expect_title = String(pm.variables.get(\"title\"));   \r",
+									"    var expect_content = String(pm.variables.get(\"content\"));\r",
+									"    var expect_tab = String(pm.variables.get(\"tab\"));\r",
+									"\r",
+									"    // console.log(\"我们的期望结果\",expect_title,expect_content,expect_tab);\r",
+									"\r",
+									"    pm.test(\"检查title字段\", function () {\r",
+									"\r",
+									"        pm.expect(title).to.eql(expect_title);\r",
+									"    });\r",
+									"\r",
+									"    pm.test(\"检查content字段\", function () {\r",
+									"\r",
+									"        pm.expect(content).to.eql(expect_content);\r",
+									"    });\r",
+									"\r",
+									"    pm.test(\"检查tab字段\", function () {\r",
+									"\r",
+									"    pm.expect(tab).to.eql(expect_tab);\r",
+									"    });\r",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "86cb4373-8e56-4d0b-9eb6-3da15852369c",
+								"exec": [
+									"var status = pm.variables.get(\"status\");\r",
+									"\r",
+									"if(status == \"fail\"){\r",
+									"    // 如果失败，给他一个默认值跑通\r",
+									"    pm.environment.set(\"topic_id\", \"5e8eceeae22e050669f33341\");\r",
+									"\r",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{sever_url}}/topic/{{topic_id}}?mdrender=false",
+							"host": [
+								"{{sever_url}}"
+							],
+							"path": [
+								"topic",
+								"{{topic_id}}"
+							],
+							"query": [
+								{
+									"key": "mdrender",
+									"value": "false"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "登录",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/x-www-form-urlencoded",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "name",
+							"value": "testuser3",
+							"type": "text"
+						},
+						{
+							"key": "pass",
+							"value": "123456",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://39.107.96.138:3000/signin",
+					"protocol": "http",
+					"host": [
+						"39",
+						"107",
+						"96",
+						"138"
+					],
+					"port": "3000",
+					"path": [
+						"signin"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "主题首页",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{sever_url}}/topics?page=2&tab=ask&limit=20&mdrender=true",
+					"host": [
+						"{{sever_url}}"
+					],
+					"path": [
+						"topics"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "2"
+						},
+						{
+							"key": "tab",
+							"value": "ask"
+						},
+						{
+							"key": "limit",
+							"value": "20"
+						},
+						{
+							"key": "mdrender",
+							"value": "true"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
