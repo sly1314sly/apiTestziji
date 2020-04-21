@@ -345,8 +345,8 @@
 									"var status = pm.variables.get(\"status\");\r",
 									"\r",
 									"if(status == \"fail\"){\r",
-									"    // 如果失败，给他一个默认值跑通\r",
-									"    pm.environment.set(\"topic_id\", \"5e8eceeae22e050669f33341\");\r",
+									"    // 如果失败，给他一个默认值跑通,注意保持统一，也要设置为全局变量\r",
+									"    pm.globals.set(\"topic_id\", \"5e8eceeae22e050669f33341\");\r",
 									"\r",
 									"}"
 								],
